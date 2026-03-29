@@ -37,7 +37,7 @@ A coluna de idade original continha strings sujas (`"17 anos, 3 meses"`). Foi im
 
 ### 3. Otimização de Tipos (Memory Mapping)
 
-Conversão de colunas de texto repetitivo para o tipo `category` do Pandas, reduzindo o consumo de RAM no servidor do Streamlit em até **70%**.
+Conversão de colunas de texto repetitivo para o tipo `category` do Pandas, reduzindo o consumo de RAM no servidor do Streamlit em até **70%**. (🤨)
 
 ---
 
