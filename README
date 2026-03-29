@@ -1,32 +1,58 @@
-# 📊 Painel Epidemiológico — COVID-19 (Espírito Santo)
+📊 Dashboard de Análise KDD - Microdados COVID-19 (ES)
+Este projeto apresenta um dashboard interativo desenvolvido com Streamlit para a análise e exploração de microdados de saúde pública do estado do Espírito Santo. O foco foi aplicar técnicas de KDD (Knowledge Discovery in Databases) para transformar dados brutos em insights visuais compreensíveis.
 
-Uma exploração de dados que transforma registros brutos em padrões compreensíveis.
+🛠️ Tecnologias Utilizadas
+Python 3.12+
 
-Este projeto constrói um **dashboard interativo** utilizando **PySpark, Streamlit e Plotly**, com foco em análise exploratória de dados epidemiológicos.
+Streamlit: Interface do usuário e deploy.
 
----
+Pandas: Manipulação e limpeza profunda de dados.
 
-## 🧠 Objetivo
+Plotly Express: Gráficos interativos e dinâmicos.
 
-Investigar:
+DuckDB (Opcional/Otimização): Consultas SQL de alta performance.
 
-- Qualidade dos dados (valores nulos)
-- Distribuição dos casos (classificação)
-- Concentração geográfica (municípios)
-- Perfil demográfico (sexo e faixa etária)
-- Aspectos clínicos (sintomas, comorbidades, letalidade)
-- Evolução temporal da pandemia
+🚀 Desafios Técnicos & Soluções (Destaques)
+Durante o desenvolvimento, foram aplicadas soluções para contornar limitações comuns em grandes volumes de dados (Big Data):
 
----
+Otimização de Memória: O dataset original possuía mais de 5 milhões de linhas (~1.8 GB). Para viabilizar o deploy no Streamlit Cloud, foi aplicada uma Amostragem Sistemática Diversificada (Início, Meio e Fim do arquivo), reduzindo o peso para o GitHub sem perder a representatividade temporal.
 
-## ⚙️ Tecnologias Utilizadas
+Limpeza de Dados (Regex): Tratamento da coluna IdadeNaDataNotificacao que continha strings complexas (ex: "17 anos, 3 meses"). Implementei uma extração via Expressão Regular (Regex) para garantir cálculos matemáticos precisos.
 
-- PySpark
-- Pandas
-- Streamlit
-- Plotly
-- Python
+Normalização de Colunas: Implementação de lógica robusta para mapear sintomas e comorbidades, ignorando variações de caixa (maiúsculo/minúsculo) e espaços em branco nos microdados.
 
----
+📈 Funcionalidades
+Visão Geral: Qualidade dos dados e volumetria de nulos.
 
-## 📁 Estrutura do Projeto
+Análise Demográfica: Distribuição por Faixa Etária (calculada) e Sexo.
+
+Fatores de Risco: Frequência de sintomas e impacto das comorbidades nos óbitos.
+
+Análise Geográfica: Top 10 municípios com maior número de notificações.
+
+Evolução Temporal: Gráfico de linha mostrando a progressão mensal dos casos.
+
+📁 Estrutura do Repositório
+Plaintext
+├── data/ # Amostra diversificada dos microdados (CSV)
+├── src/ # Módulos de processamento lógico (Python)
+│ ├── carregarDados.py
+│ ├── faixaEtaria.py
+│ ├── sintomas.py
+│ └── evolucaoTemporal.py
+├── app.py # Arquivo principal do Streamlit
+├── requirements.txt # Dependências do projeto
+└── README.md # Documentação
+🔧 Como rodar o projeto localmente
+Clone o repositório:
+
+Bash
+git clone https://github.com/nicholetzs/KDD.git
+Instale as dependências:
+
+Bash
+pip install -r requirements.txt
+Execute o Streamlit:
+
+Bash
+streamlit run app.py
