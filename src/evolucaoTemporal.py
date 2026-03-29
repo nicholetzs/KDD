@@ -1,14 +1,11 @@
-from pyspark.sql.functions import col, count, when, to_date, date_format
 import pandas as pd
-import streamlit as st
+
 
 def evolucao_temporal(df):
-    df = df.withColumn("DataNotificacao", to_date(col("DataNotificacao")))
-    df = df.withColumn("AnoMes", date_format(col("DataNotificacao"), "yyyy-MM"))
+    df["Data"] = pd.to_datetime(df["Data"], errors="coerce")
 
-    resultado = df.groupBy("AnoMes").count().orderBy("AnoMes")
+    df["AnoMes"] = df["Data"].dt.to_period("M")
 
-    pdf = resultado.toPandas()
-    pdf = pdf.rename(columns={"count": "Quantidade"})
+    dados = df.groupby("AnoMes").size().reset_index(name="Quantidade")
 
-    return pdf
+    return dados

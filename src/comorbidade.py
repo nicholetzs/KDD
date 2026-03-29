@@ -1,22 +1,16 @@
-
-from pyspark.sql.functions import col
 import pandas as pd
-import streamlit as st
+
 
 def comorbidades_obitos(df):
-    comorbidades = [
-        'ComorbidadePulmao', 'ComorbidadeCardio', 'ComorbidadeRenal',
-        'ComorbidadeDiabetes', 'ComorbidadeTabagismo', 'ComorbidadeObesidade'
-    ]
+    df_obitos = df[df["Evolucao"] == "Óbito pelo COVID-19"]
 
-    obitos = df.filter(col("Evolucao") == "Óbito pelo COVID-19")
+    cols = ["Diabetes", "Cardiopatia", "Obesidade"]
 
-    resultado = {}
+    dados = {}
+    for col in cols:
+        dados[col] = (df_obitos[col] == "Sim").sum()
 
-    for c in comorbidades:
-        resultado[c] = obitos.filter(col(c) == "Sim").count()
-
-    pdf = pd.DataFrame(list(resultado.items()), columns=["Comorbidade", "Quantidade"])
-    pdf = pdf.sort_values("Quantidade", ascending=False)
-
-    return pdf
+    return (
+        pd.DataFrame(list(dados.items()), columns=["Comorbidade", "Quantidade"])
+        .sort_values(by="Quantidade", ascending=False)
+    )

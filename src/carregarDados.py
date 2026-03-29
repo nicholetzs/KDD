@@ -1,20 +1,20 @@
-
-import os
-from pyspark.sql import SparkSession
+import pandas as pd
 import streamlit as st
+import os
 
-@st.cache_resource
+@st.cache_data
 def carregar_dados():
-    spark = SparkSession.builder.appName("MICRODADOS").getOrCreate()
-
     caminho = os.path.abspath("data/MICRODADOS.csv")
 
-    df = spark.read.csv(
+    df = pd.read_csv(
         caminho,
-        header=True,
         sep=";",
-        encoding="iso-8859-1"
+        encoding="iso-8859-1",
+        low_memory=False
     )
-    df = df.cache()
+
+    # OTIMIZAÇÃO CRÍTICA
+    for col in df.select_dtypes(include="object").columns:
+        df[col] = df[col].astype("category")
 
     return df

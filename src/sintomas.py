@@ -1,18 +1,14 @@
 import pandas as pd
-from pyspark.sql.functions import col
+
 
 def sintomas_frequentes(df):
-    sintomas = [
-        'Febre', 'DificuldadeRespiratoria', 'Tosse',
-        'Coriza', 'DorGarganta', 'Diarreia', 'Cefaleia'
-    ]
+    sintomas_cols = ["Febre", "Tosse", "Garganta", "Dispneia"]
 
-    resultado = {}
+    dados = {}
+    for col in sintomas_cols:
+        dados[col] = (df[col] == "Sim").sum()
 
-    for s in sintomas:
-        resultado[s] = df.filter(col(s) == "Sim").count()
-
-    pdf = pd.DataFrame(list(resultado.items()), columns=["Sintoma", "Quantidade"])
-    pdf = pdf.sort_values("Quantidade", ascending=False)
-
-    return pdf
+    return (
+        pd.DataFrame(list(dados.items()), columns=["Sintoma", "Quantidade"])
+        .sort_values(by="Quantidade", ascending=False)
+    )

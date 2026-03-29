@@ -1,25 +1,13 @@
-from pyspark.sql.functions import col, count, when, to_date, date_format
 import pandas as pd
 
-import streamlit as st
 
-def taxa_letalidade(df):
-    confirmados = df.filter(col("Classificacao") == "Confirmados")
+def faixa_etaria(df):
+    bins = [0, 18, 30, 45, 60, 75, 100]
+    labels = ["0-18", "19-30", "31-45", "46-60", "61-75", "76+"]
 
-    total = confirmados.count()
+    df["FaixaEtaria"] = pd.cut(df["Idade"], bins=bins, labels=labels)
 
-    obitos_covid = confirmados.filter(col("Evolucao") == "Óbito pelo COVID-19").count()
-    obitos_outras = confirmados.filter(col("Evolucao") == "Óbito por outras causas").count()
-    cura = confirmados.filter(col("Evolucao") == "Cura").count()
-    ignorado = confirmados.filter(col("Evolucao") == "Ignorado").count()
+    dados = df["FaixaEtaria"].value_counts().sort_index().reset_index()
+    dados.columns = ["FaixaEtaria", "Quantidade"]
 
-    taxa = (obitos_covid / total) * 100 if total > 0 else 0
-
-    return {
-        "total": total,
-        "obitos_covid": obitos_covid,
-        "obitos_outras": obitos_outras,
-        "cura": cura,
-        "ignorado": ignorado,
-        "taxa": taxa
-    }
+    return dados

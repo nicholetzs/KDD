@@ -1,17 +1,4 @@
-import pandas as pd
-
 def top_municipios(df):
-    resultado = (
-        df.groupBy("Municipio")
-        .count()
-        .orderBy("count", ascending=False)
-        .limit(10)
-    )
-
-    pdf = resultado.toPandas()
-
-    pdf = pdf.rename(columns={
-        "count": "Número de Notificações"
-    })
-
-    return pdf
+    dados = df["Municipio"].value_counts().head(10).reset_index()
+    dados.columns = ["Municipio", "Número de Notificações"]
+    return dados
