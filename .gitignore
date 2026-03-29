@@ -1,2 +1,7 @@
 venv/
-MICRODADOS.csv
+
+notebook/covid.ipynb
+data/MICRODADOS.csv
+venv/
+.env
+__pycache__/

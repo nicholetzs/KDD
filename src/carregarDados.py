@@ -4,7 +4,7 @@ import os
 
 @st.cache_data
 def carregar_dados():
-    caminho = os.path.abspath("data/MICRODADOS.csv")
+    caminho = os.path.abspath("data/MICRODADOS_DIVERSIFICADO.csv")
 
     df = pd.read_csv(
         caminho,
