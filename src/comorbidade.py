@@ -1,6 +1,5 @@
 import pandas as pd
 
-
 def comorbidades_obitos(df):
     df_obitos = df[df["Evolucao"] == "Óbito pelo COVID-19"]
 

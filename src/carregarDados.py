@@ -24,7 +24,7 @@ def carregar_dados():
         encoding="iso-8859-1",
         low_memory=False
     )
-
+    
     # OTIMIZAÇÃO CRÍTICA
     for col in df.select_dtypes(include="object").columns:
         df[col] = df[col].astype("category")

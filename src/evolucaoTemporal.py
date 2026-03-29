@@ -1,6 +1,5 @@
 import pandas as pd
 
-
 def evolucao_temporal(df):
     df["Data"] = pd.to_datetime(df["Data"], errors="coerce")
 
