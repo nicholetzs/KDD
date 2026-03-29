@@ -11,6 +11,7 @@ def carregar_dados():
         sep=";",
         encoding="iso-8859-1",
         low_memory=False
+
     )
 
     # OTIMIZAÇÃO CRÍTICA
