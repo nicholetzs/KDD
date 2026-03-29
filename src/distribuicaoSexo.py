@@ -1,4 +1,4 @@
-def top_municipios(df):
-    dados = df["Municipio"].value_counts().head(10).reset_index()
-    dados.columns = ["Municipio", "Número de Notificações"]
+def distribuicao_sexo(df):
+    dados = df["Sexo"].value_counts().reset_index()
+    dados.columns = ["Sexo", "Frequência"]
     return dados

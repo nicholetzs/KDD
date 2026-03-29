@@ -1,13 +1,7 @@
-import pandas as pd
+def taxa_letalidade(df):
+    total = len(df)
+    obitos = (df["Evolucao"] == "Óbito pelo COVID-19").sum()
 
+    taxa = (obitos / total) * 100 if total > 0 else 0
 
-def faixa_etaria(df):
-    bins = [0, 18, 30, 45, 60, 75, 100]
-    labels = ["0-18", "19-30", "31-45", "46-60", "61-75", "76+"]
-
-    df["FaixaEtaria"] = pd.cut(df["Idade"], bins=bins, labels=labels)
-
-    dados = df["FaixaEtaria"].value_counts().sort_index().reset_index()
-    dados.columns = ["FaixaEtaria", "Quantidade"]
-
-    return dados
+    return {"taxa": taxa}
