@@ -2,15 +2,14 @@ import streamlit as st
 import plotly.express as px
 import pandas as pd
 
-# Configuração da página (DEVE ser a primeira linha)
+# 1. Configuração de Layout
 st.set_page_config(
-    page_title="Painel Epidemiológico COVID-19",
+    page_title="Data Science - COVID-19 ES",
     page_icon="🧬",
-    layout="wide", # Usa a tela inteira, estilo dashboard profissional
-    initial_sidebar_state="expanded"
+    layout="wide" 
 )
 
-# Importações dos seus módulos
+# Importações
 from src.carregarDados import carregar_dados
 from src.calcularNulos import calcular_nulos
 from src.distribuicaoClassificacao import distribuicao_classificacao
@@ -21,116 +20,97 @@ from src.sintomas import sintomas_frequentes
 from src.comorbidade import comorbidades_obitos
 from src.evolucaoTemporal import evolucao_temporal
 
-# =========================
-# ESTILIZAÇÃO CUSTOMIZADA (CSS)
-# =========================
-st.markdown("""
-    <style>
-    .main { background-color: #f5f7f9; }
-    .stMetric { background-color: #ffffff; padding: 15px; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-    [data-testid="stSidebar"] { background-color: #111d2b; color: white; }
-    </style>
-    """, unsafe_allow_html=True)
+# 2. Carga de Dados
+@st.cache_data
+def get_data():
+    return carregar_dados()
 
-# =========================
-# SIDEBAR MODERNA
-# =========================
-with st.sidebar:
-    st.image("https://www.freeiconspng.com/uploads/virus-icon-1.png", width=80)
-    st.title("Navegação")
-    # Trocamos o radio por um selectbox mais limpo ou botões
-    secao = st.selectbox(
-        "Selecione o módulo de análise:",
-        ["📌 Visão Geral", "📊 Classificação & Ranking", "👥 Perfil Demográfico", "🏥 Análise Clínica", "📅 Evolução Temporal"]
-    )
-    st.divider()
-    st.info("Projeto KDD - Análise de Microdados")
+df = get_data()
 
-# =========================
-# CARREGAMENTO DE DADOS
-# =========================
-with st.spinner("Sincronizando base de dados..."):
-    df = carregar_dados()
+# 3. Cabeçalho Principal (Moderno)
+st.title("🧬 Intelligence Dashboard | COVID-19")
+st.markdown("---")
 
-# =========================
-# HEADER CIENTÍFICO
-# =========================
-col_tit, col_logo = st.columns([4, 1])
-with col_tit:
-    st.title("🧬 Monitoramento Epidemiológico — COVID-19")
-    st.caption("Estudo fundamentado em Processo de KDD (Knowledge Discovery in Databases)")
-
-# Métricas Rápidas (KPIs) no topo
+# 4. KPIs (Métricas de Topo) - Agora com cores visíveis
 m1, m2, m3, m4 = st.columns(4)
-m1.metric("Total de Notificações", f"{len(df):,}")
-m2.metric("Municípios Analisados", df['Municipio'].nunique())
-m3.metric("Status", "Amostra Otimizada")
-m4.metric("Versão", "2026.1")
+with m1:
+    st.metric("Total de Amostras", f"{len(df):,}")
+with m2:
+    st.metric("Municípios", df['Municipio'].nunique())
+with m3:
+    st.metric("Variáveis", len(df.columns))
+with m4:
+    st.metric("Engine", "Pandas/KDD")
 
-st.divider()
+st.write("") # Espaçamento
 
-# =========================
-# LÓGICA DAS SEÇÕES
-# =========================
+# 5. Navegação por TABS (Substituindo o select/radio da sidebar)
+# Isso deixa o design muito mais "Dashboard de BI"
+tab_geral, tab_demografico, tab_clinico, tab_temporal = st.tabs([
+    "🔍 Visão Geral", 
+    "👥 Perfil Demográfico", 
+    "🏥 Análise Clínica", 
+    "📅 Evolução Temporal"
+])
 
-if secao == "📌 Visão Geral":
-    st.subheader("🔍 Diagnóstico da Integridade dos Dados")
-    nulos = calcular_nulos(df)
+# --- CONTEÚDO DAS TABS ---
+
+with tab_geral:
+    st.subheader("Análise de Ranking e Qualidade")
+    col1, col2 = st.columns([1.2, 1]) # Proporção para não apertar o gráfico
     
-    col1, col2 = st.columns([1, 2])
     with col1:
-        st.write("Registros ausentes por variável:")
-        st.dataframe(nulos, use_container_width=True)
+        dados_mun = top_municipios(df)
+        fig_mun = px.bar(
+            dados_mun, x="Número de Notificações", y="Municipio", 
+            orientation='h', color="Número de Notificações",
+            color_continuous_scale="Viridis",
+            title="Top 10 Municípios com Maior Incidência"
+        )
+        st.plotly_chart(fig_mun, use_container_width=True)
+        
     with col2:
-        fig = px.bar(nulos, x="Coluna", y="Quantidade", color="Quantidade", color_continuous_scale="Reds", title="Missing Values (Nulos)")
-        st.plotly_chart(fig, use_container_width=True)
+        nulos = calcular_nulos(df)
+        fig_nulos = px.pie(nulos.head(10), names="Coluna", values="Quantidade", title="Top 10 Colunas com Dados Faltantes")
+        st.plotly_chart(fig_nulos, use_container_width=True)
 
-elif secao == "📊 Classificação & Ranking":
+with tab_demografico:
+    st.subheader("Perfil dos Notificados")
     c1, c2 = st.columns(2)
     
     with c1:
-        st.subheader("📍 Ranking de Municípios")
-        dados_mun = top_municipios(df)
-        fig_mun = px.bar(dados_mun, x="Número de Notificações", y="Municipio", orientation='h', color="Número de Notificações", title="Top 10 Municípios (Volume)")
-        st.plotly_chart(fig_mun, use_container_width=True)
-        
-    with c2:
-        st.subheader("📋 Classificação de Casos")
-        dados_class = distribuicao_classificacao(df)
-        fig_class = px.pie(dados_class, names="Classificacao", values="Frequência Absoluta", hole=0.4, title="Status das Notificações")
-        st.plotly_chart(fig_class, use_container_width=True)
-
-elif secao == "👥 Perfil Demográfico":
-    st.subheader("👥 Perfil Populacional")
-    col1, col2 = st.columns(2)
-    
-    with col1:
         sexo = distribuicao_sexo(df)
-        fig_sexo = px.pie(sexo, names="Sexo", values="Frequência", title="Distribuição por Sexo", color_discrete_sequence=px.colors.qualitative.Pastel)
+        fig_sexo = px.pie(sexo, names="Sexo", values="Frequência", hole=0.5, title="Distribuição por Gênero")
         st.plotly_chart(fig_sexo, use_container_width=True)
         
-    with col2:
+    with c2:
         faixa = faixa_etaria(df)
-        fig_faixa = px.bar(faixa, x="FaixaEtaria", y="Quantidade", title="Pirâmide Etária (Amostra)", color_discrete_sequence=['#4c78a8'])
+        fig_faixa = px.bar(faixa, x="FaixaEtaria", y="Quantidade", color="FaixaEtaria", title="Distribuição por Faixa Etária (Anos)")
         st.plotly_chart(fig_faixa, use_container_width=True)
 
-elif secao == "🏥 Análise Clínica":
-    st.subheader("🩺 Indicadores Clínicos e Comorbidades")
+with tab_clinico:
+    st.subheader("Indicadores de Saúde")
+    # Usando colunas para sintomas e comorbidades ficarem grandes
+    col_sint, col_comorb = st.columns(2)
     
-    tab1, tab2 = st.tabs(["Sintomas Frequentes", "Comorbidades (Óbitos)"])
-    
-    with tab1:
+    with col_sint:
         sintomas = sintomas_frequentes(df)
-        fig_sint = px.bar(sintomas, x="Quantidade", y="Sintoma", orientation='h', title="Prevalência de Sintomas", color="Quantidade")
+        fig_sint = px.bar(sintomas, x="Sintoma", y="Quantidade", color="Sintoma", title="Sintomas Mais Relatados")
         st.plotly_chart(fig_sint, use_container_width=True)
         
-    with tab2:
+    with col_comorb:
         comorb = comorbidades_obitos(df)
-        fig_com = px.treemap(comorb, path=['Comorbidade'], values='Quantidade', title="Mapa de Calor: Comorbidades Associadas")
+        fig_com = px.bar(comorb, x="Comorbidade", y="Quantidade", color="Comorbidade", title="Comorbidades Presentes em Óbitos")
         st.plotly_chart(fig_com, use_container_width=True)
 
-elif secao == "📅 Evolução Temporal":
-    st.subheader("📈 Série Temporal de Notificações")
+with tab_temporal:
+    st.subheader("Análise Cronológica")
     tempo = evolucao_temporal(df)
-    fig_tempo = px.area(tempo, x="AnoMes", y="Quantidade", title="Progressão Mensal de Casos", line_shape="spline", color_discrete_sequence=['#1f77b4'])
+    # Gráfico de linha grande para ver bem a curva
+    fig_tempo = px.line(
+        tempo, x="AnoMes", y="Quantidade", 
+        title="Curva de Notificações ao Longo do Tempo",
+        markers=True
+    )
+    fig_tempo.update_traces(line_color='#FF4B4B')
     st.plotly_chart(fig_tempo, use_container_width=True)
