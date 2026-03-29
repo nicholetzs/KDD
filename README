@@ -1,58 +1,9 @@
-📊 Dashboard de Análise KDD - Microdados COVID-19 (ES)
-Este projeto apresenta um dashboard interativo desenvolvido com Streamlit para a análise e exploração de microdados de saúde pública do estado do Espírito Santo. O foco foi aplicar técnicas de KDD (Knowledge Discovery in Databases) para transformar dados brutos em insights visuais compreensíveis.
-
-🛠️ Tecnologias Utilizadas
-Python 3.12+
-
-Streamlit: Interface do usuário e deploy.
-
-Pandas: Manipulação e limpeza profunda de dados.
-
-Plotly Express: Gráficos interativos e dinâmicos.
-
-DuckDB (Opcional/Otimização): Consultas SQL de alta performance.
-
-🚀 Desafios Técnicos & Soluções (Destaques)
-Durante o desenvolvimento, foram aplicadas soluções para contornar limitações comuns em grandes volumes de dados (Big Data):
-
-Otimização de Memória: O dataset original possuía mais de 5 milhões de linhas (~1.8 GB). Para viabilizar o deploy no Streamlit Cloud, foi aplicada uma Amostragem Sistemática Diversificada (Início, Meio e Fim do arquivo), reduzindo o peso para o GitHub sem perder a representatividade temporal.
-
-Limpeza de Dados (Regex): Tratamento da coluna IdadeNaDataNotificacao que continha strings complexas (ex: "17 anos, 3 meses"). Implementei uma extração via Expressão Regular (Regex) para garantir cálculos matemáticos precisos.
-
-Normalização de Colunas: Implementação de lógica robusta para mapear sintomas e comorbidades, ignorando variações de caixa (maiúsculo/minúsculo) e espaços em branco nos microdados.
-
-📈 Funcionalidades
-Visão Geral: Qualidade dos dados e volumetria de nulos.
-
-Análise Demográfica: Distribuição por Faixa Etária (calculada) e Sexo.
-
-Fatores de Risco: Frequência de sintomas e impacto das comorbidades nos óbitos.
-
-Análise Geográfica: Top 10 municípios com maior número de notificações.
-
-Evolução Temporal: Gráfico de linha mostrando a progressão mensal dos casos.
-
-📁 Estrutura do Repositório
-Plaintext
-├── data/ # Amostra diversificada dos microdados (CSV)
-├── src/ # Módulos de processamento lógico (Python)
+🚀 KDD & Data Analysis: COVID-19 Microdados (ES)<p align="center"><img src="https://img.shields.io/github/repo-size/nicholetzs/KDD?style=for-the-badge&color=gold" alt="Repo Size"><img src="https://img.shields.io/github/languages/top/nicholetzs/KDD?style=for-the-badge&color=blue" alt="Top Language"><img src="https://img.shields.io/github/last-commit/nicholetzs/KDD?style=for-the-badge&color=orange" alt="Last Commit"></p>Status do Projeto: 🟢 Em Produção (Streamlit Cloud)Objetivo: Aplicar o processo de KDD em uma base de dados real de saúde pública, otimizando performance e visualização.🛠️ Stack TecnológicaTecnologiaFunçãoPython 3.12Linguagem BasePandasEngenharia e Limpeza de DadosStreamlitInterface Web e DashboardPlotlyGráficos DinâmicosGit LFSGerenciamento de Arquivos Grandes🧠 Engenharia de Dados & DesafiosO projeto lidou com um dataset bruto de ~1.8 GB. Para tornar o dashboard viável e performático, foram aplicadas as seguintes técnicas:1. Amostragem Sistemática DiversificadaEm vez de pegar apenas as primeiras linhas, o script de carga captura fatias do início, meio e fim do arquivo original. Isso garante que a análise temporal (Evolução de Casos) permaneça fiel à realidade do dataset completo, mas ocupando apenas 1% do espaço original.2. Limpeza via Regex (Expressões Regulares)A coluna de idade original continha strings sujas ("17 anos, 3 meses"). Foi implementado um extrator numérico para converter esses dados em Inteiros, permitindo a criação de bins (faixas etárias) precisos para o gráfico.3. Otimização de Tipos (Memory Mapping)Conversão de colunas de texto repetitivo para o tipo category do Pandas, reduzindo o consumo de RAM no servidor do Streamlit em até 70%.📊 Visualizações Disponíveis✅ Sintomas Frequentes: Ranking dinâmico baseado em múltiplas colunas do CSV.✅ Perfil de Comorbidades: Cruzamento de dados entre óbitos e condições pré-existentes.✅ Distribuição Geográfica: Top 10 municípios com maior incidência.✅ Timeline: Evolução mensal das notificações capturadas na amostra.📂 Organização do ProjetoBash├── data/ # Dataset CSV otimizado
+├── src/ # Lógica modularizada (Clean Code)
 │ ├── carregarDados.py
 │ ├── faixaEtaria.py
 │ ├── sintomas.py
-│ └── evolucaoTemporal.py
-├── app.py # Arquivo principal do Streamlit
-├── requirements.txt # Dependências do projeto
-└── README.md # Documentação
-🔧 Como rodar o projeto localmente
-Clone o repositório:
-
-Bash
-git clone https://github.com/nicholetzs/KDD.git
-Instale as dependências:
-
-Bash
-pip install -r requirements.txt
-Execute o Streamlit:
-
-Bash
-streamlit run app.py
+│ └── ...
+├── app.py # Entry point do Streamlit
+└── requirements.txt # Dependências do ambiente
+👩‍💻 AutoriaNichole Computer Scientist & Software DeveloperDica para o GitHub:Se você quiser que o seu nome apareça com um link, mude a última linha para:[Nichole](https://github.com/nicholetzs)
