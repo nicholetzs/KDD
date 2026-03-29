@@ -6,59 +6,44 @@
   <img src="https://img.shields.io/github/last-commit/nicholetzs/KDD?style=for-the-badge&color=orange" alt="Last Commit">
 </p>
 
-> **Status do Projeto:** 🟢 Em Produção (Streamlit Cloud)  
-> **Objetivo:** Aplicar o processo de KDD em uma base de dados real de saúde pública, otimizando performance e visualização.
+> **Status do Projeto:** 🟢 Em Produção  
+> **Acesse o Dashboard:** [🔗 Data Science - COVID-19 ES · Streamlit](https://xawpfum7gezaxhvqwlphtb.streamlit.app/)
+
+---
+
+## 🌐 Visite o Projeto Online
+
+O dashboard interativo está disponível publicamente. Explore as métricas em tempo real através do link oficial:  
+👉 **[Clique aqui para acessar o Dashboard](https://xawpfum7gezaxhvqwlphtb.streamlit.app/)**
 
 ---
 
 ## 🛠️ Stack Tecnológica
 
-| Tecnologia      | Função                            |
-| :-------------- | :-------------------------------- |
-| **Python 3.12** | Linguagem Base                    |
-| **Pandas**      | Engenharia e Limpeza de Dados     |
-| **Streamlit**   | Interface Web e Dashboard         |
-| **Plotly**      | Gráficos Dinâmicos                |
-| **Git LFS**     | Gerenciamento de Arquivos Grandes |
+| Tecnologia         | Função                                |
+| :----------------- | :------------------------------------ |
+| **Python 3.12**    | Linguagem de Programação              |
+| **Pandas**         | Manipulação e Engenharia de Atributos |
+| **Streamlit**      | Framework para Aplicações de Dados    |
+| **Plotly Express** | Visualização de Dados Dinâmica        |
 
 ---
 
 ## 🧠 Engenharia de Dados & Desafios
 
-O projeto lidou com um dataset bruto de **~1.8 GB**. Para tornar o dashboard viável e performático, foram aplicadas as seguintes técnicas:
+Este projeto aplica o ciclo de vida **KDD (Knowledge Discovery in Databases)** sobre uma base de dados governamental de ~1.8 GB:
 
-### 1. Amostragem Sistemática Diversificada
-
-Em vez de pegar apenas as primeiras linhas, o script de carga captura fatias do **início, meio e fim** do arquivo original. Isso garante que a análise temporal permaneça fiel à realidade do dataset completo, mas ocupando apenas **1% do espaço original**.
-
-### 2. Limpeza via Regex (Expressões Regulares)
-
-A coluna de idade original continha strings sujas (`"17 anos, 3 meses"`). Foi implementado um extrator numérico para converter esses dados em **Inteiros**, permitindo a criação de faixas etárias precisas.
-
-### 3. Otimização de Tipos (Memory Mapping)
-
-Conversão de colunas de texto repetitivo para o tipo `category` do Pandas, reduzindo o consumo de RAM no servidor do Streamlit em até **70%**. (🤨)
+1. **Amostragem Estratégica**: Implementação de carga por fatias (head, middle e tail) para preservar a integridade da série temporal.
+2. **Data Cleaning (Regex)**: Normalização de dados categóricos e limpeza de strings complexas para cálculos de faixa etária.
+3. **Otimização de Performance**: Redução de footprint de memória para deploy em infraestrutura cloud gratuita.
 
 ---
 
-## 📊 Visualizações Disponíveis
+## 📥 Como baixar e rodar o projeto localmente
 
-- ✅ **Sintomas Frequentes:** Ranking dinâmico baseado em múltiplas colunas do CSV.
-- ✅ **Perfil de Comorbidades:** Cruzamento de dados entre óbitos e condições pré-existentes.
-- ✅ **Distribuição Geográfica:** Top 10 municípios com maior incidência.
-- ✅ **Timeline:** Evolução mensal das notificações capturadas na amostra.
-
----
-
-## 📂 Organização do Projeto
+### 1. Clonar o Repositório
 
 ```bash
-├── data/               # Dataset CSV otimizado
-├── src/                # Lógica modularizada (Clean Code)
-│   ├── carregarDados.py
-│   ├── faixaEtaria.py
-│   ├── sintomas.py
-│   └── ...
-├── app.py              # Entry point do Streamlit
-└── requirements.txt    # Dependências do ambiente
+git clone [https://github.com/nicholetzs/KDD.git](https://github.com/nicholetzs/KDD.git)
+cd KDD
 ```
