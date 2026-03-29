@@ -1,0 +1,218 @@
+# 📊 Painel Epidemiológico — COVID-19 (Espírito Santo)
+
+Uma exploração de dados que não é apenas visualização, mas um esforço de dar forma ao caos — transformar milhões de registros dispersos em padrões compreensíveis.
+
+Este projeto constrói um **dashboard interativo** utilizando **PySpark, Streamlit e Plotly**, com foco em análise exploratória de dados epidemiológicos de COVID-19.
+
+---
+
+## 🧠 Objetivo
+
+Investigar, de forma sistemática e reprodutível:
+
+* Qualidade dos dados (valores nulos)
+* Distribuição dos casos (classificação)
+* Concentração geográfica (municípios)
+* Perfil demográfico (sexo e faixa etária)
+* Aspectos clínicos (sintomas, comorbidades, letalidade)
+* Evolução temporal da pandemia
+
+A proposta segue uma abordagem de **KDD (Knowledge Discovery in Databases)**:
+
+> Dados → Transformação → Padrões → Conhecimento
+
+---
+
+## ⚙️ Tecnologias Utilizadas
+
+| Tecnologia | Papel no sistema                   |
+| ---------- | ---------------------------------- |
+| PySpark    | Processamento distribuído de dados |
+| Pandas     | Estruturação de resultados         |
+| Streamlit  | Interface interativa               |
+| Plotly     | Visualizações dinâmicas            |
+| Python     | Orquestração geral                 |
+
+---
+
+## 📁 Estrutura do Projeto
+
+```
+KDD/
+│
+├── app.py                 # Interface principal (Streamlit)
+├── data/
+│   └── MICRODADOS.csv     # Base de dados
+│
+├── src/
+│   ├── carregarDados.py
+│   ├── calcularNulos.py
+│   ├── distribuicaoClassificacao.py
+│   ├── distribuicaoSexo.py
+│   ├── faixaEtaria.py
+│   ├── letalidade.py
+│   ├── sintomas.py
+│   ├── comorbidade.py
+│   ├── evolucaoTemporal.py
+│   ├── tabelaCruzada.py
+│   ├── topMunicipios.py
+│   └── layout.py          # Estilo e componentes visuais
+│
+└── venv/                  # Ambiente virtual
+```
+
+---
+
+## 🚀 Como Executar
+
+### 1. Clone o repositório
+
+```bash
+git clone <seu-repo>
+cd KDD
+```
+
+### 2. Crie o ambiente virtual
+
+```bash
+python -m venv venv
+source venv/bin/activate  # Linux/Mac
+venv\Scripts\activate     # Windows
+```
+
+### 3. Instale as dependências
+
+```bash
+pip install -r requirements.txt
+```
+
+### 4. Execute o dashboard
+
+```bash
+streamlit run app.py
+```
+
+---
+
+## 🧩 Arquitetura do Sistema
+
+O projeto é dividido em duas camadas principais:
+
+### 🔹 Camada de Processamento (src/)
+
+Funções puras responsáveis por:
+
+* Filtrar
+* Agrupar
+* Agregar dados
+
+Essas funções recebem um **DataFrame Spark** e retornam:
+
+* DataFrames Pandas (para visualização)
+* Métricas agregadas
+
+---
+
+### 🔹 Camada de Apresentação (app.py)
+
+Responsável por:
+
+* Interface
+* Navegação
+* Renderização dos gráficos
+* Experiência do usuário
+
+---
+
+## 📊 Funcionalidades
+
+### 🔍 1. Qualidade dos Dados
+
+* Contagem de valores nulos
+* Percentual por coluna
+
+### 🧪 2. Classificação dos Casos
+
+* Frequência absoluta e percentual
+
+### 🌍 3. Municípios
+
+* Top 10 com mais notificações
+* Identificação do líder
+
+### 👥 4. Perfil Demográfico
+
+* Distribuição por sexo
+* Distribuição por faixa etária
+
+### 🧬 5. Análise Clínica
+
+* Taxa de letalidade
+* Sintomas mais frequentes
+* Comorbidades em óbitos
+
+### 📈 6. Evolução Temporal
+
+* Série histórica por mês
+* Identificação de ondas da pandemia
+
+### 🔗 7. Tabela Cruzada
+
+* Município × Evolução
+* Letalidade por município
+
+---
+
+## ⚡ Performance e Otimização
+
+Alguns pontos importantes:
+
+* Uso de `@st.cache_resource` para manter o DataFrame Spark
+* Evitar múltiplos `.collect()` desnecessários
+* Conversão para Pandas apenas no momento da visualização
+
+> Spark é preguiçoso (lazy). O custo real só aparece quando você força a execução.
+
+---
+
+## ⚠️ Limitações
+
+* Dependência de memória ao converter para Pandas
+* Possível lentidão em operações com `.collect()`
+* Dados podem conter inconsistências e subnotificação
+
+---
+
+## 🔬 Possíveis Melhorias
+
+* Filtros interativos (data, município)
+* Integração com banco de dados
+* Deploy em nuvem (Streamlit Cloud / AWS)
+* Modelos de Machine Learning (classificação de casos)
+* Detecção automática de ondas epidemiológicas
+
+---
+
+## ✨ Reflexão Final
+
+Este projeto não é apenas um dashboard.
+
+É uma tentativa de traduzir fenômenos complexos —
+curvas epidêmicas, sofrimento humano, padrões invisíveis —
+em algo que possa ser analisado, questionado e compreendido.
+
+Porque dados, por si só, são silenciosos.
+Mas quando bem tratados, contam histórias.
+
+---
+
+## 👩‍💻 Autora
+
+Nichole
+Cientista de Dados | IA aplicada à Astronomia | Desenvolvedora
+
+---
+
+## 📜 Licença
+
+Uso acadêmico e educacional.
