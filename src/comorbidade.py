@@ -1,6 +1,7 @@
 
 from pyspark.sql.functions import col
 import pandas as pd
+import streamlit as st
 
 def comorbidades_obitos(df):
     comorbidades = [

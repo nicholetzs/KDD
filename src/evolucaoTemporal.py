@@ -1,5 +1,6 @@
 from pyspark.sql.functions import col, count, when, to_date, date_format
 import pandas as pd
+import streamlit as st
 
 def evolucao_temporal(df):
     df = df.withColumn("DataNotificacao", to_date(col("DataNotificacao")))

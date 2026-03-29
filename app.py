@@ -1,189 +1,219 @@
-from src.comorbidade import comorbidades_obitos
+
+import streamlit as st
+import plotly.express as px
+
+from src.carregarDados import carregar_dados
+from src.calcularNulos import calcular_nulos
 from src.distribuicaoClassificacao import distribuicao_classificacao
+from src.topMunicipios import top_municipios
 from src.distribuicaoSexo import distribuicao_sexo
-from src.evolucaoTemporal import evolucao_temporal
 from src.faixaEtaria import faixa_etaria
 from src.letalidade import taxa_letalidade
 from src.sintomas import sintomas_frequentes
+from src.comorbidade import comorbidades_obitos
+from src.evolucaoTemporal import evolucao_temporal
 from src.tabelaCruzada import tabela_cruzada
-from src.topMunicipios import top_municipios
-from src.calcularNulos import calcular_nulos
 
-import streamlit as st
-from pyspark.sql import SparkSession
-import plotly.express as px
-import os
+# =========================
+# SIDEBAR
+# =========================
+st.sidebar.title("⚙️ Controles")
 
-# -------------------------
-# APP
-# -------------------------
-st.title("📊 Dashboard COVID")
-
-# -------------------------
-# Spark
-# -------------------------
-spark = SparkSession.builder.appName("MICRODADOS").getOrCreate()
-
-caminho = os.path.abspath("data/MICRODADOS.csv")
-
-df = spark.read.csv(
-    caminho,
-    header=True,
-    sep=";",
-    encoding="iso-8859-1"
+secao = st.sidebar.radio(
+    "Escolha a análise:",
+    [
+        "Visão Geral",
+        "Classificação",
+        "Municípios",
+        "Perfil Demográfico",
+        "Clínico",
+        "Temporal"
+    ]
 )
 
-# -------------------------
-# NULOS
-# -------------------------
-st.subheader("Quantidade de Nulos por Coluna")
+# =========================
+# TÍTULO
+# =========================
+st.title("📊 Painel Epidemiológico — COVID-19")
+st.caption("PySpark + Streamlit + Plotly")
+st.divider()
 
-nulos_pd = calcular_nulos(df)
-st.dataframe(nulos_pd)
+# =========================
+# DADOS
+# =========================
+with st.spinner("Carregando dados..."):
+    df = carregar_dados()
 
-fig = px.bar(nulos_pd, x="Coluna", y="Quantidade")
-st.plotly_chart(fig, use_container_width=True)
+# =========================
+# VISÃO GERAL
+# =========================
+if secao == "Visão Geral":
 
-# -------------------------
+    st.subheader("Qualidade dos Dados")
+
+    with st.spinner("Calculando nulos..."):
+        nulos = calcular_nulos(df)
+
+    st.dataframe(nulos)
+
+    fig = px.bar(nulos, x="Coluna", y="Quantidade")
+    st.plotly_chart(fig, use_container_width=True)
+
+# =========================
 # CLASSIFICAÇÃO
-# -------------------------
-st.subheader("Distribuição por Classificação")
+# =========================
+elif secao == "Classificação":
 
-df_classificacao = distribuicao_classificacao(df)
-st.dataframe(df_classificacao)
+    st.subheader("Distribuição por Classificação")
 
-fig = px.bar(
-    df_classificacao,
-    x="Classificacao",
-    y="Frequência Absoluta"
-)
+    with st.spinner("Calculando classificação..."):
+        dados = distribuicao_classificacao(df)
 
-st.plotly_chart(fig, use_container_width=True)
+    st.dataframe(dados)
 
-# -------------------------
-# TOP MUNICÍPIOS
-# -------------------------
-st.subheader("Top 10 Municípios")
+    fig = px.bar(
+        dados,
+        x="Classificacao",
+        y="Frequência Absoluta"
+    )
 
-df_top = top_municipios(df)
-st.dataframe(df_top)
+    st.plotly_chart(fig, use_container_width=True)
 
-fig = px.bar(
-    df_top,
-    x="Municipio",
-    y="Número de Notificações"
-)
+# =========================
+# MUNICÍPIOS
+# =========================
+elif secao == "Municípios":
 
-st.plotly_chart(fig, use_container_width=True)
+    st.subheader("Top 10 Municípios")
 
-lider = df_top.iloc[0]
+    with st.spinner("Calculando ranking..."):
+        dados = top_municipios(df)
 
-st.markdown(f"""
-### 🥇 Município líder  
-**{lider['Municipio']}** possui **{lider['Número de Notificações']:,} notificações**
-""")
+    st.dataframe(dados)
 
-# -------------------------
-# SEXO
-# -------------------------
-st.subheader("Distribuição por Sexo")
+    fig = px.bar(
+        dados,
+        x="Municipio",
+        y="Número de Notificações"
+    )
 
-sexo = distribuicao_sexo(df)
-st.dataframe(sexo)
+    st.plotly_chart(fig, use_container_width=True)
 
-fig = px.pie(
-    sexo,
-    names="Sexo",
-    values="Frequência"
-)
+    lider = dados.iloc[0]
 
-st.plotly_chart(fig, use_container_width=True)
+    st.success(
+        f"{lider['Municipio']} lidera com {lider['Número de Notificações']:,} casos"
+    )
 
-# -------------------------
-# FAIXA ETÁRIA
-# -------------------------
-st.subheader("Faixa Etária")
+# =========================
+# PERFIL DEMOGRÁFICO
+# =========================
+elif secao == "Perfil Demográfico":
 
-faixa = faixa_etaria(df)
-st.dataframe(faixa)
+    # Sexo
+    st.subheader("Sexo")
 
-fig = px.bar(
-    faixa,
-    x="FaixaEtaria",
-    y="Quantidade"
-)
+    with st.spinner("Calculando sexo..."):
+        sexo = distribuicao_sexo(df)
 
-st.plotly_chart(fig, use_container_width=True)
+    st.dataframe(sexo)
 
-# -------------------------
-# LETALIDADE
-# -------------------------
-st.subheader("Taxa de Letalidade")
+    fig = px.pie(
+        sexo,
+        names="Sexo",
+        values="Frequência"
+    )
 
-letal = taxa_letalidade(df)
+    st.plotly_chart(fig, use_container_width=True)
 
-st.write(letal)
+    # Faixa etária
+    st.subheader("Faixa Etária")
 
-st.markdown(f"""
-Taxa de letalidade: **{letal['taxa']:.2f}%**
-""")
+    with st.spinner("Calculando faixa etária..."):
+        faixa = faixa_etaria(df)
 
-# -------------------------
-# SINTOMAS
-# -------------------------
-st.subheader("Sintomas mais Frequentes")
+    st.dataframe(faixa)
 
-sintomas = sintomas_frequentes(df)
-st.dataframe(sintomas)
+    fig = px.bar(
+        faixa,
+        x="FaixaEtaria",
+        y="Quantidade"
+    )
 
-fig = px.bar(
-    sintomas,
-    x="Sintoma",
-    y="Quantidade"
-)
+    st.plotly_chart(fig, use_container_width=True)
 
-st.plotly_chart(fig, use_container_width=True)
+# =========================
+# CLÍNICO
+# =========================
+elif secao == "Clínico":
 
-# -------------------------
-# COMORBIDADES
-# -------------------------
-st.subheader("Comorbidades nos Óbitos")
+    # Letalidade
+    st.subheader("Taxa de Letalidade")
 
-comorb = comorbidades_obitos(df)
-st.dataframe(comorb)
+    with st.spinner("Calculando letalidade..."):
+        letal = taxa_letalidade(df)
 
-fig = px.bar(
-    comorb,
-    x="Comorbidade",
-    y="Quantidade"
-)
+    st.metric("Taxa (%)", f"{letal['taxa']:.2f}")
 
-st.plotly_chart(fig, use_container_width=True)
+    # Sintomas
+    st.subheader("Sintomas")
 
-# -------------------------
+    with st.spinner("Calculando sintomas..."):
+        sintomas = sintomas_frequentes(df)
+
+    st.dataframe(sintomas)
+
+    fig = px.bar(
+        sintomas,
+        x="Sintoma",
+        y="Quantidade"
+    )
+
+    st.plotly_chart(fig, use_container_width=True)
+
+    # Comorbidades
+    st.subheader("Comorbidades")
+
+    with st.spinner("Calculando comorbidades..."):
+        comorb = comorbidades_obitos(df)
+
+    st.dataframe(comorb)
+
+    fig = px.bar(
+        comorb,
+        x="Comorbidade",
+        y="Quantidade"
+    )
+
+    st.plotly_chart(fig, use_container_width=True)
+
+# =========================
 # TEMPORAL
-# -------------------------
-st.subheader("Evolução Temporal")
+# =========================
+elif secao == "Temporal":
 
-tempo = evolucao_temporal(df)
-st.dataframe(tempo)
+    st.subheader("Evolução Temporal")
 
-fig = px.line(
-    tempo,
-    x="AnoMes",
-    y="Quantidade"
-)
+    with st.spinner("Calculando série temporal..."):
+        tempo = evolucao_temporal(df)
 
-st.plotly_chart(fig, use_container_width=True)
+    st.dataframe(tempo)
 
-# -------------------------
-# CROSSTAB
-# -------------------------
-st.subheader("Tabela Cruzada")
+    fig = px.line(
+        tempo,
+        x="AnoMes",
+        y="Quantidade"
+    )
 
-crosstab, letalidade = tabela_cruzada(df)
+    st.plotly_chart(fig, use_container_width=True)
 
-st.dataframe(crosstab)
+    # Crosstab
+    st.subheader("Tabela Cruzada")
 
-st.write("Taxa de letalidade por município:")
-st.write(letalidade)
+    with st.spinner("Calculando cruzamento..."):
+        crosstab, letalidade = tabela_cruzada(df)
+
+    st.dataframe(crosstab)
+
+    st.write("Letalidade por município:")
+    st.write(letalidade)

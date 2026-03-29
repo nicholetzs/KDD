@@ -1,6 +1,7 @@
 from pyspark.sql.functions import col, count, when, to_date, date_format
 import pandas as pd
 
+import streamlit as st
 
 def taxa_letalidade(df):
     confirmados = df.filter(col("Classificacao") == "Confirmados")

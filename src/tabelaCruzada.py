@@ -1,7 +1,11 @@
+from pyspark.sql.functions import col, count
 import pandas as pd
-from pyspark.sql.functions import col
 
 def tabela_cruzada(df):
+
+    # -------------------------
+    # TOP 5 MUNICÍPIOS
+    # -------------------------
     top5 = (
         df.groupBy("Municipio")
         .count()
@@ -11,12 +15,37 @@ def tabela_cruzada(df):
 
     top5_lista = [row["Municipio"] for row in top5.collect()]
 
+    # -------------------------
+    # FILTRAR
+    # -------------------------
     filtrado = df.filter(col("Municipio").isin(top5_lista))
 
-    pdf = filtrado.toPandas()
+    # -------------------------
+    # 🔥 AGRUPAMENTO NO SPARK
+    # -------------------------
+    agrupado = (
+        filtrado
+        .groupBy("Municipio", "Evolucao")
+        .count()
+    )
 
-    crosstab = pd.crosstab(pdf["Municipio"], pdf["Evolucao"])
+    # -------------------------
+    # 🔥 AGORA SIM (pequeno!)
+    # -------------------------
+    pdf = agrupado.toPandas()
 
+    # -------------------------
+    # PIVOT
+    # -------------------------
+    crosstab = pdf.pivot(
+        index="Municipio",
+        columns="Evolucao",
+        values="count"
+    ).fillna(0)
+
+    # -------------------------
+    # LETALIDADE
+    # -------------------------
     letalidade = {}
 
     for municipio in crosstab.index:

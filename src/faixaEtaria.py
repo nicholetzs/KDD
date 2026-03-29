@@ -1,3 +1,6 @@
+
+import streamlit as st
+
 def faixa_etaria(df):
     resultado = df.groupBy("FaixaEtaria").count()
 
